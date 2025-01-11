@@ -7,6 +7,13 @@ Base on ESP8266 and MQTT communication
 - 1 LED status indicator 
 - And thats all...
 
+## Project
+
+This project required share repo added as a synbolic link to src directory.
+
+https://github.com/radomirmazon/smarthome_shared
+
+
 ## HA automation cofig for digital input setting up.
 
 After restart modules wait for HA booting up, and send request on MQTT for configuration (few times). It sends message on topic getConfig/input/{number} and HA should responds on topic config/input/{number} with payload bell or switch.
