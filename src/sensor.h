@@ -7,16 +7,19 @@
 #include "shared/mqtt_module.h"
 #include "logger.h"
 #include "shared/timer.h"
+#include "shared/switch_button.h"
 
-class Sensor :public BaseDevice {
+class Sensor :public BaseDevice, ChangeDetector {
   private:
   String internalState;
   bool lastState = false;
   bool bell = false;
   const char * channel;
   Timer configTimer;
-  uint8_t configCounter =10;
+  uint8_t configAttemptCounter =10;
   MqttModule* pMqtt;
+  SwitchButton* pSwitchButton;
+  bool invertState = true;
 
   public:
   Sensor(int initState, const char * channel, const char * deviceName, const char * topicTemplate, MqttModule* pMqtt) 
@@ -24,11 +27,13 @@ class Sensor :public BaseDevice {
       lastState = initState > 0;
       this->channel = channel;
       this->pMqtt = pMqtt;
-      getNextConfigTimer();
+      this->pSwitchButton = new SwitchButton(this, lastState, invertState, bell);
+      configTimer.start(1000 + random(100, 1000));
   }
 
   void begin() {
     BaseDevice::begin();
+    pSwitchButton->begin();
   }
 
 
@@ -39,25 +44,35 @@ class Sensor :public BaseDevice {
    */
   void loop(int newState) {
     configTimer.loop();
-    if (configTimer.isAlarm() && (configCounter--) > 0) {
+    if (configTimer.isAlarm() && (configAttemptCounter--) > 0) {
       getNextConfigTimer();
       configRequest();
     }
     
-    
+    pSwitchButton->loop();
+
     if (newState == -1) {
       return;
     }
+
     //have new state
     if (lastState != newState) {
       lastState = newState;
-      newStateDetected(newState);
+      pSwitchButton->setState(newState);
     }
   }
 
   bool onState(String state) {
     //sensor doesn't support setting state from HA
     return 0;
+  }
+
+  void stateChanged(bool s) {
+    if (s) {
+        setState(String("ON"));
+    } else {
+        setState(String("OFF"));
+    }
   }
 
   void onConfig(String config) {
@@ -79,15 +94,6 @@ class Sensor :public BaseDevice {
   }
 
   private:
-  void newStateDetected(int state) {
-    if (state > 0) {
-      setState("ON");
-    } else {
-      setState("OFF");
-    }
-    
-  }
-
   void getNextConfigTimer() {
     configTimer.start(10000 + random(100, 1000));
   }
