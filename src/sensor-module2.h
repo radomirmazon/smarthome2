@@ -53,7 +53,7 @@ class SensorModule2 {
       //calculate timeout or interrupt flag...
       long lastLoop = millis() - time;
       bool isTimeout = false;
-      if (lastLoop > 100 || isrFlag) {
+      if (lastLoop > 1000 || isrFlag) {
         time = millis();
         isTimeout = true;
         isrFlag = false;
