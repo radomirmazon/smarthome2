@@ -67,12 +67,21 @@ class Sensor :public BaseDevice, ChangeDetector {
     return 0;
   }
 
-  void stateChanged(bool s) {
+  void stateBoolDetected(bool s) {
     if (s) {
         setState(String("ON"));
     } else {
         setState(String("OFF"));
     }
+  }
+
+  void stateClickDetected(uint8_t value) {
+    setState(String("CLICK_") + String(value));
+    setState(String("CLICK_0"));
+  }
+
+  void stateNumberDetected(uint8_t value) {
+
   }
 
   void onConfig(String config) {
