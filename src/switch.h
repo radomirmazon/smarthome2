@@ -16,7 +16,7 @@ class Switch :public BaseDevice {
 
   public:
   Switch(const char * channel, Config* pConfig, MqttModule* pMqtt, SwitchSetter* pSwitchSetter, int pinNumber) 
-    : BaseDevice(pMqtt, channel, pConfig->switchDeviceName, pConfig->mqtt_topic_template, true, false) {
+    : BaseDevice(pMqtt, channel, pConfig->switchDeviceName, pConfig->switchDeviceName, pConfig->mqtt_topic_template, true, false) {
       this->pConfig = pConfig;
       this->pSwitchSetter = pSwitchSetter;
       this->pinNumber = pinNumber;

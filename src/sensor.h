@@ -7,28 +7,31 @@
 #include "shared/mqtt_module.h"
 #include "logger.h"
 #include "shared/timer.h"
-#include "shared/switch_button.h"
+#include "shared/button.h"
+#include "config.h"
 
 class Sensor :public BaseDevice, ChangeDetector {
   private:
   String internalState;
   bool lastState = false;
-  bool bell = false;
   const char * channel;
-  Timer configTimer;
-  uint8_t configAttemptCounter =10;
   MqttModule* pMqtt;
   SwitchButton* pSwitchButton;
   bool invertState = true;
+  Config* pConfig;
 
   public:
-  Sensor(int initState, const char * channel, const char * deviceName, const char * topicTemplate, MqttModule* pMqtt) 
-    : BaseDevice(pMqtt, channel, deviceName, topicTemplate, false, true) {
+  Sensor(int initState, const char * channel, Config* pConfig, MqttModule* pMqtt) 
+    : BaseDevice(pMqtt, channel, 
+          pConfig->sensorSwitchDeviceName,
+          pConfig->sensorBellDeviceName,
+          pConfig->mqtt_topic_template, false, false) 
+  {      
       lastState = initState > 0;
       this->channel = channel;
       this->pMqtt = pMqtt;
-      this->pSwitchButton = new SwitchButton(this, lastState, invertState, bell);
-      configTimer.start(1000 + random(100, 1000));
+      this->pConfig = pConfig;
+      this->pSwitchButton = new SwitchButton(this, lastState, invertState);
   }
 
   void begin() {
@@ -43,12 +46,6 @@ class Sensor :public BaseDevice, ChangeDetector {
    * != -1 => real value
    */
   void loop(int newState) {
-    configTimer.loop();
-    if (configTimer.isAlarm() && (configAttemptCounter--) > 0) {
-      getNextConfigTimer();
-      configRequest();
-    }
-    
     pSwitchButton->loop();
 
     if (newState == -1) {
@@ -62,51 +59,27 @@ class Sensor :public BaseDevice, ChangeDetector {
     }
   }
 
-  bool onState(String state) {
-    //sensor doesn't support setting state from HA
-    return 0;
-  }
-
   void stateBoolDetected(bool s) {
     if (s) {
-        setState(String("ON"));
+        setState(String(pConfig->sensor_on));
     } else {
-        setState(String("OFF"));
+        setState(String(pConfig->sensor_off));
     }
   }
 
   void stateClickDetected(uint8_t value) {
-    setState(String("CLICK_") + String(value));
-    setState(String("CLICK_0"));
-  }
-
-  void stateNumberDetected(uint8_t value) {
-
+    setState2(String(pConfig->sensor_bell_prefix) + String(value));
+    setState2(String(pConfig->sensor_bell_prefix) + String(0));
   }
 
   void onConfig(String config) {
-    configTimer.cancel();
-    if (config == "bell") {
-      bell = true;
-      Serial.println("Config set as bell");
-    } else {
-      Serial.println("Config set as switch");
-    }
+    //not supported
   }
 
-
-  uint8_t mapState(String sState) {
-    if (sState == "1") {
-      return 1;
-    }
+  bool onState(String state) {
+    //sensor doesn't support setting state from HA
     return 0;
   }
-
-  private:
-  void getNextConfigTimer() {
-    configTimer.start(10000 + random(100, 1000));
-  }
-  
 };
 
 
