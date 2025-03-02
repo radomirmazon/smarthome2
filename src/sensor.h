@@ -17,7 +17,7 @@ class Sensor :public BaseDevice, ChangeDetector {
   const char * channel;
   MqttModule* pMqtt;
   SwitchButton* pSwitchButton;
-  bool invertState = true;
+  bool invertState = false;
   Config* pConfig;
 
   public:

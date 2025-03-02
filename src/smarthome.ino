@@ -19,11 +19,12 @@ MqttModule* pMqtt = new MqttModule(&espClient,
     config.mgtt_topic,
     &logger);
 
-SensorModule sensor0(0x20, (uint8_t[]){0,1,2,3,4,5,6,7}, false, pMqtt, &config, &logger);
-SensorModule sensor1(0x21, (uint8_t[]){8,9,10,11,12,13,14,15}, false, pMqtt, &config, &logger);
-SensorModule sensor2(0x22, (uint8_t[]){16,17,18,19,20,21,22,23}, false, pMqtt, &config, &logger);
-SensorModule sensor3(0x23, (uint8_t[]){24,25,26,27,28,29,30,31}, false, pMqtt, &config, &logger);
-SensorModule sensor4(0x24, (uint8_t[]){32,33,34,35,36,37,38,39}, false, pMqtt, &config, &logger);
+SensorModule sensor0(0x20, (uint8_t[]){ 1, 2, 3, 4, 5, 6, 7, 8}, false, pMqtt, &config, &logger);                             
+SensorModule sensor1(0x21, (uint8_t[]){ 0,29,28,27,26,25,24,23}, false, pMqtt, &config, &logger);
+SensorModule sensor2(0x22, (uint8_t[]){30,31,32,33,22,21,20, 9}, false, pMqtt, &config, &logger);
+SensorModule sensor3(0x23, (uint8_t[]){34,35,36,37,38,39,11,10}, false, pMqtt, &config, &logger);
+SensorModule sensor4(0x24, (uint8_t[]){19,18,17,16,15,14,13,12}, false, pMqtt, &config, &logger);
+
 SwitchModule switch0(0x25, 0, true, pMqtt, &config, &logger);
 SwitchModule switch1(0x26, 1, true, pMqtt, &config, &logger);
 
@@ -51,7 +52,7 @@ void ICACHE_RAM_ATTR isr4() {
 
 void setup()
 {
-  Serial.begin(9600);
+  //Serial.begin(9600);
   Serial.println("\nHello\n");
   logger.begin();
   delay(200);
