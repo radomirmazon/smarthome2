@@ -1,11 +1,13 @@
 #ifndef p_logger_h
 #define p_logger_h
 
+#define LED_PIN 16
+
 class Logger {
   public:
 
   void begin() {
-    pinMode(16, OUTPUT);
+    pinMode(LED_PIN, OUTPUT);
     time = millis();
   }
 
@@ -19,7 +21,7 @@ class Logger {
 
   void setBlinkOnce() {
     ledState = false;
-    digitalWrite(16, false);
+    digitalWrite(LED_PIN, false);
     state = 5;
     wait = 2;
     loop();
@@ -66,36 +68,36 @@ class Logger {
   void tick() {
     switch(state) {
       case 0:
-        digitalWrite(16, false);
+        digitalWrite(LED_PIN, false);
       break;
       case 1:
         wait = 500;
         ledState = !ledState;
-        digitalWrite(16, ledState);
+        digitalWrite(LED_PIN, ledState);
       break;
       case 2:
         wait = 100;
         ledState = !ledState;
-        digitalWrite(16, ledState);
+        digitalWrite(LED_PIN, ledState);
       break;
       case 3:
         counter++;
         wait = 80;
         if (counter > 2) {
           ledState = !ledState;
-          digitalWrite(16, ledState);
+          digitalWrite(LED_PIN, ledState);
         }
         if (counter > 6) {
           counter = 0;
-          digitalWrite(16, false);
+          digitalWrite(LED_PIN, false);
         }
       break;
       case 4:
-        digitalWrite(16, true);
+        digitalWrite(LED_PIN, true);
       break;
       case 5:
         ledState = !ledState;
-        digitalWrite(16, ledState);
+        digitalWrite(LED_PIN, ledState);
         if (!ledState) {
           off();
         }

@@ -2,7 +2,6 @@
 #define Sensor__h
 
 #include <stdlib.h>
-#include "lib/pcf8574.h"
 #include "shared/base_device.h"
 #include "shared/mqtt_module.h"
 #include "logger.h"
